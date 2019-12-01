@@ -1,82 +1,78 @@
-// 查询数据列表
-const getList = (author, keyword) => {
-  // 返回假数据
-  return [
-    {
-      id: 1,
-      title: '标题a',
-      content: '内容a',
-      createTime: 1574605758831,
-      author: '作者a',
-    },
-    {
-      id: 2,
-      title: '标题b',
-      content: '内容b',
-      createTime: 1574605758831,
-      author: '作者b',
-    },
-    {
-      id: 3,
-      title: '标题c',
-      content: '内容c',
-      createTime: 1574605758831,
-      author: '作者3',
-    }
-  ]
-}
+const {
+  exec
+} = require('../db/mysql');
+
 
 // 查询数据列表
-const getDetail = (author, keyword) => {
-  // 返回假数据
-  return [
-    {
-      id: 1,
-      title: '标题a',
-      content: '内容a',
-      createTime: 1574605758831,
-      author: '作者a',
-    }
-  ]
+const getList = (author, title) => {
+  let sql = `select * from blogs where 1=1 `;
+  if (author) {
+    sql += `and author='${author}' `;
+  }
+  if (title) {
+    sql += `and title like '%${title}%' `;
+  }
+  sql += `order by createtime desc;`;
+  return exec(sql);
+}
+
+// 查询详情数据
+const getDetail = (id) => {
+  let sql = `select * from blogs where 1=1 `;
+  if (id) {
+    sql += `and id='${id}';`;
+  }
+  return exec(sql);
 }
 
 // 新增数据
 const newBlog = (data = {}) => {
-  return {
-    ...data,
-    id: 3
-  }
+  const title = data.title;
+  const content = data.content;
+  const author = data.author;
+  const createTime = Date.now();
+  const sql = `insert into blogs (title, content, author, createtime) values ('${title}', '${content}', '${author}', '${createTime}');`;
+  return exec(sql).then(new_blog => {
+    // console.log(new_blog);
+    return {
+      id: new_blog.insertId,
+    };
+  });
 }
 
 // 更新数据
-const updateBlog = (data = {}) => {
-  console.log('update-id:', data);
-  if (data && data.id) {
-    return {
-      success: true
+const updateBlog = (id, data = {}) => {
+  const title = data.title;
+  const content = data.content;
+  const sql = `update blogs set title='${title}', content='${content}' where id='${id}';`;
+  return exec(sql).then(update_data => {
+    // console.log('update:', update_data);
+    // affectedRows-影响行数
+    if (update_data.affectedRows > 0) {
+      return true;
     }
-  }
-  return {
-    success: false
-  }
+    return false;
+  })
 }
 
 // 删除数据
 const deleteBlog = (data = {}) => {
-  console.log('update-id:', data);
-  if (data && data.id) {
-    return {
-      success: true
+  const id = data.id;
+  const author = data.author;
+  const sql = `delete from blogs where id='${id}' and author='${author}';`;
+  return exec(sql).then(delete_data => {
+    // affectedRows-影响行数
+    if (delete_data.affectedRows > 0) {
+      return true;
     }
-  }
-  return {
-    success: false
-  }
+    return false;
+  })
 }
 
 module.exports = {
   getList,
   getDetail,
   newBlog,
-  updateBlog
+  updateBlog,
+  deleteBlog
 };

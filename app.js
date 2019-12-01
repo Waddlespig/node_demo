@@ -43,12 +43,22 @@ const serverHandler = (req, res) => {
     req.body = postData;
 
     // blog数据返回
+    // const blogData = handlerBlog(req, res);
+    // if (blogData) {
+    //   res.end(JSON.stringify({
+    //     ...blogData,
+    //     env: process.env.NODE_ENV
+    //   }))
+    //   return;
+    // }
     const blogData = handlerBlog(req, res);
     if (blogData) {
-      res.end(JSON.stringify({
-        ...blogData,
-        env: process.env.NODE_ENV
-      }))
+      blogData.then(blog_data => {
+          res.end(JSON.stringify({
+            ...blog_data,
+            env: process.env.NODE_ENV
+          }));
+      });
       return;
     }
 
