@@ -65,10 +65,12 @@ const serverHandler = (req, res) => {
     // user数据返回
     const userData = handlerUser(req, res);
     if (userData) {
-      res.end(JSON.stringify({
-        ...userData,
-        env: process.env.NODE_ENV
-      }))
+      userData.then(user_data => {
+        res.end(JSON.stringify({
+          ...user_data,
+          env: process.env.NODE_ENV
+        }))
+      })
       return;
     }
 

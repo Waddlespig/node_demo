@@ -11,12 +11,13 @@ const handlerUser = (req, res) => {
   const method = req.method;
 
   if (method === 'POST' && req.path === '/api/user/login') {
-    const loginData = login(req.body);
-    if (loginData.success) {
-      return new SuccessModel(loginData, '登陆成功')
-    } else {
-      return new ErrorModel(loginData, '登陆失败')
-    }
+    return login.then(user_data => {
+      if (user_data.username) {
+        return new SuccessModel('登陆成功')
+      } else {
+        return new ErrorModel('登陆失败')
+      }
+    })
   }
 }
 
